@@ -1,0 +1,16 @@
+{
+  "host": "localhost",
+  "database": "rinku_cinemas",
+  "username": "acardoza",
+  "password": "90H8j(7c*bFv",
+  "port": 3306,
+  "dialect": "mysql",
+  "directory": "./src/models",
+  "caseFile": "c",
+  "caseModel": "p",
+  "lang": "esm",
+  "additional": {
+    "timestamps": false
+  },
+  "useDefine": true
+}

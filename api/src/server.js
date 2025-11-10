@@ -1,9 +1,9 @@
-import dotenv from "dotenv";
-import cors from "cors";
-import Express from "express";
-import Http from "http";
-import db from "./config/database.js";
-import Router from "./routes.js";
+import dotenv from 'dotenv';
+import cors from 'cors';
+import Express from 'express';
+import Http from 'http';
+import db from './config/database.js';
+import Router from './routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -21,12 +21,12 @@ Router(app);
 const initializeDatabase = async () => {
   try {
     await db.authenticate();
-    console.log("✅ Database connected successfully");
+    console.log('✅ Database connected successfully');
 
-    await db.sync({ alter: true });
-    console.log("✅ Database synced");
+    await db.sync({ alter: false });
+    console.log('✅ Database synced');
   } catch (error) {
-    console.error("❌ Database connection error:", error);
+    console.error('❌ Database connection error:', error);
     process.exit(1);
   }
 };
@@ -34,9 +34,9 @@ const initializeDatabase = async () => {
 // initialize database before starting the server
 initializeDatabase().then(() => {
   // Create HTTP server
-  Http.createServer(app).listen(port, "0.0.0.0", () => {
+  Http.createServer(app).listen(port, '0.0.0.0', () => {
     console.log(`🚀 Servicio iniciado`);
-    console.log(`📍 Env: ${process.env.NODE_ENV || "development"}`);
+    console.log(`📍 Env: ${process.env.NODE_ENV || 'development'}`);
     console.log(`📍 Puerto: ${port}`);
     console.log(`📍 http://localhost:${port}`);
   });
@@ -46,7 +46,7 @@ initializeDatabase().then(() => {
 app.use((err, req, res, next) => {
   console.log(err.stack);
   res.status(500).json({
-    error: "Ups, Something went wrong...",
+    error: 'Ups, Something went wrong...',
     messagge: err.messagge,
   });
 });
