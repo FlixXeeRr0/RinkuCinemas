@@ -1,21 +1,18 @@
-import React from "react";
-import {
-  BrowserRouter,
-  Navigate,
-  Outlet,
-  Route,
-  Routes,
-} from "react-router-dom";
-import Box from "@mui/material/Box";
+import React, { Fragment } from 'react';
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import Box from '@mui/material/Box';
 
-import AppBarComponent from "../components/AppBar/AppBar";
+import AppBarComponent from '../components/AppBar/AppBar';
+import StartPage from '../pages/start';
+import EmployeePage from '../pages/employees';
+import NotFoundPage from '../pages/notFound';
 
 const Layout = React.memo(function Layout() {
   return (
-    <>
+    <div style={{ height: '100svh', backgroundColor: '#f5f5f5' }}>
       <AppBarComponent />
       <Outlet />
-    </>
+    </div>
   );
 });
 
@@ -27,10 +24,11 @@ export const AppRouter = () => {
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="inicio" />} />
 
-          <Route path="inicio" element={<Box sx={{ p: 2 }}>Página de inicio</Box>} />
+          <Route path="inicio" element={<StartPage />} />
+          <Route path="empleados" element={<EmployeePage />} />
         </Route>
 
-        <Route path="/*" element={<Box sx={{ p: 2 }}>Page no found</Box>} />
+        <Route path="/*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );
