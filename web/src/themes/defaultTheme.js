@@ -6,11 +6,11 @@ let theme = createTheme({
     primary: blue,
     secondary: lightBlue,
     background: {
-      default: '#f5f8ff',
+      default: '#f5f5f5',
       paper: '#ffffff',
     },
     text: {
-      primary: blue[900],
+      primary: blue[700],
       secondary: blue[500],
     },
   },
