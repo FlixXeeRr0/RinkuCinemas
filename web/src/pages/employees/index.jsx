@@ -1,15 +1,11 @@
 import {
   Box,
   Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
   styled,
   Typography,
 } from '@mui/material';
 import { useCallback, useState } from 'react';
-import { FaSearch, FaRegTrashAlt, FaSave, FaChevronDown } from 'react-icons/fa';
+import { FaSearch, FaRegTrashAlt, FaSave } from 'react-icons/fa';
 import { IoPersonAdd } from 'react-icons/io5';
 import { CiEdit } from 'react-icons/ci';
 import { IoMdClose } from 'react-icons/io';
