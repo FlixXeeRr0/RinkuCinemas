@@ -36,7 +36,7 @@ const AppBarComponent = () => {
       <CustomButton
         variant="contained"
         startIcon={<FaUsers />}
-        onClick={() => navigate(MenuEnum.EMPLOYEE_PAGE)}
+        onClick={() => navigate(MenuEnum.EMPLOYEES_PAGE)}
       >
         <Typography variant="h5" sx={{ fontWeight: 500 }}>
           Empleados
@@ -46,7 +46,7 @@ const AppBarComponent = () => {
       <CustomButton
         variant="contained"
         startIcon={<GiArchiveRegister />}
-        onClick={() => navigate(MenuEnum.REGISTER_PAGE)}
+        onClick={() => navigate(MenuEnum.TRANSACTIONS_PAGE)}
       >
         <Typography variant="h5" sx={{ fontWeight: 500 }}>
           Captura

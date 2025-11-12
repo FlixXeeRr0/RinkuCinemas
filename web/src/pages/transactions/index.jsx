@@ -1,20 +1,17 @@
 import {
   Box,
   Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
+  Checkbox,
+  FormControlLabel,
   styled,
   Typography,
 } from '@mui/material';
 import { useCallback, useState } from 'react';
-import { FaSearch, FaRegTrashAlt, FaSave, FaChevronDown } from 'react-icons/fa';
-import { IoPersonAdd } from 'react-icons/io5';
+import { FaSearch, FaRegTrashAlt, FaSave } from 'react-icons/fa';
 import { CiEdit } from 'react-icons/ci';
 import { IoMdClose } from 'react-icons/io';
 import CustomTextField from '../../components/CustomTextField';
-import CustomSelect from '../../components/CustomSelect';
+import CustomSelect from '../../components/CustomSelect'; // 👈 asegúrate de tener este componente
 
 const MainBox = styled(Box)(({ theme }) => ({
   height: 'calc(100svh - 61px)',
@@ -50,43 +47,25 @@ const FormContainer = styled(Box)(({ theme }) => ({
   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
 }));
 
-const EmployeePage = () => {
+const TransactionsPage = () => {
   const [isEditActive, setIsEditActive] = useState(false);
-  const [role, setRole] = useState('');
+  const [coveredShift, setCoveredShift] = useState(false);
   const [employeeType, setEmployeeType] = useState('');
-
-  const roles = [
-    { value: '1', label: 'Chofer' },
-    { value: '2', label: 'Cargador' },
-    { value: '3', label: 'Auxiliar' },
-  ];
-  const tipos = [
-    { value: '1', label: 'Interno' },
-    { value: '2', label: 'Externo' },
-  ];
 
   const handleSearch = useCallback(() => {
     console.log('Buscando...');
   }, []);
-
-  const handleRoleChange = (event) => {
-    setRole(event.target.value);
-  };
-
-  const handleTypeChange = (event) => {
-    setType(event.target.value);
-  };
 
   return (
     <MainBox>
       <ContainerBox>
         <BorderBottomContainer>
           <Typography variant="h4" sx={{ textAlign: 'start', fontWeight: 500 }}>
-            Empleados
+            Captura de movimientos
           </Typography>
         </BorderBottomContainer>
 
-        {/* Finder */}
+        {/** Finder */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 10, width: '100%' }}>
           <CustomTextField
             id="search"
@@ -95,17 +74,9 @@ const EmployeePage = () => {
             icon={<FaSearch />}
             onIconClick={handleSearch}
           />
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<IoPersonAdd />}
-            sx={{ maxHeight: '36px' }}
-          >
-            Nuevo Empleado
-          </Button>
         </Box>
 
-        {/* Form */}
+        {/** Form */}
         <FormContainer>
           <Box
             sx={{
@@ -127,35 +98,61 @@ const EmployeePage = () => {
               </Box>
 
               <Box sx={{ display: 'flex', gap: 3, marginTop: 1 }}>
-                {/* Select to choise a employee role */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ display: 'flex', alignItems:'center', gap: 2, width: '50%' }}>
                   <Typography sx={{ textAlign: 'start' }}>Rol:</Typography>
-                  <CustomSelect
-                    id="role"
-                    placeholder="Selecciona un rol"
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    options={roles}
-                    onIconClick={() => console.log('Abrir opciones')}
-                  />
+                  <CustomTextField id="role" fullWidth />
                 </Box>
-                
-                {/* Select to choise a employee type */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ display: 'flex', alignItems:'center', gap: 2, width: '50%' }}>
                   <Typography sx={{ textAlign: 'start' }}>Tipo:</Typography>
-                  <CustomSelect
-                    id="employeeType"
-                    placeholder="Selecciona un tipo"
-                    value={employeeType}
-                    onChange={(e) => setEmployeeType(e.target.value)}
-                    options={tipos}
-                    onIconClick={() => console.log('Abrir opciones')}
-                  />
+                  <CustomTextField id="employeeType" fullWidth />
                 </Box>
               </Box>
+
+              <Box sx={{ display: 'flex', gap: 3, marginTop: 1 }}>
+                <Box sx={{ display: 'flex', alignItems:'center', gap: 2, width: '50%' }}>
+                  <Typography sx={{ textAlign: 'start' }}>Fecha:</Typography>
+                  <CustomTextField id="date" fullWidth />
+                </Box>
+                <Box sx={{ display: 'flex', alignItems:'center', gap: 2, width: '50%' }}>
+                  <Typography sx={{ textAlign: 'start' }}>Número de entregas:</Typography>
+                  <CustomTextField id="deliveries" />
+                </Box>
+              </Box>
+
+              {/** Checkbox + Select */}
+              <FormContainer sx={{ width: 'auto' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 4, padding: 1 }}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={coveredShift}
+                        onChange={(e) => setCoveredShift(e.target.checked)}
+                        color="primary"
+                      />
+                    }
+                    label="Cubrió turno"
+                  />
+
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '50%' }}>
+                    <Typography sx={{ textAlign: 'start' }}>Tipo de empleado:</Typography>
+                    <CustomSelect
+                      id="employeeTypeSelect"
+                      value={employeeType}
+                      onChange={(e) => setEmployeeType(e.target.value)}
+                      options={[
+                        { value: 'operativo', label: 'Operativo' },
+                        { value: 'administrativo', label: 'Administrativo' },
+                        { value: 'temporal', label: 'Temporal' },
+                      ]}
+                      placeholder="Selecciona tipo..."
+                      fullWidth
+                    />
+                  </Box>
+                </Box>
+              </FormContainer>
             </Box>
 
-            {/* Action Buttons */}
+            {/** Action buttons */}
             <Box
               sx={{
                 display: 'flex',
@@ -170,9 +167,9 @@ const EmployeePage = () => {
                 variant="contained"
                 sx={{
                   maxHeight: '36px',
-                  background: isEditActive ? '#1976d2' : '#FFAB00',
+                  background: isEditActive ? 'primary.main' : '#FFAB00',
                   '&:hover': {
-                    background: isEditActive ? '#115293' : '#d99100',
+                    background: isEditActive ? '#0047b3' : '#d99100',
                   },
                 }}
                 startIcon={isEditActive ? <FaSave /> : <CiEdit />}
@@ -201,4 +198,4 @@ const EmployeePage = () => {
   );
 };
 
-export default EmployeePage;
+export default TransactionsPage;
