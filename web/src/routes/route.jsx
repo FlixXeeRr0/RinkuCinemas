@@ -6,6 +6,7 @@ import AppBarComponent from '../components/AppBar/AppBar';
 import StartPage from '../pages/start';
 import EmployeePage from '../pages/employees';
 import NotFoundPage from '../pages/notFound';
+import TransactionsPage from '../pages/transactions';
 
 const Layout = React.memo(function Layout() {
   return (
@@ -26,6 +27,7 @@ export const AppRouter = () => {
 
           <Route path="inicio" element={<StartPage />} />
           <Route path="empleados" element={<EmployeePage />} />
+          <Route path="captura" element={<TransactionsPage />} />
         </Route>
 
         <Route path="/*" element={<NotFoundPage />} />
