@@ -120,7 +120,7 @@ const TransactionsPage = () => {
               </Box>
 
               {/** Checkbox + Select */}
-              <FormContainer sx={{ width: 'auto' }}>
+              <FormContainer sx={{ width: 'auto', marginTop: 1 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 4, padding: 1 }}>
                   <FormControlLabel
                     control={
@@ -133,7 +133,7 @@ const TransactionsPage = () => {
                     label="Cubrió turno"
                   />
 
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '50%' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Typography sx={{ textAlign: 'start' }}>Tipo de empleado:</Typography>
                     <CustomSelect
                       id="employeeTypeSelect"
