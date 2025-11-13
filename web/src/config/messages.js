@@ -18,3 +18,13 @@ export const CATALOG_ERROR = 'Error al cargar los catálogos';
 // DIALOG MESASGES
 export const DELETE_DIALOG_TITLE = 'Confirmar eliminación';
 export const DELETE_DIALOG_TEXT = (objectName, value) => `¿Está seguro que desea eliminar al ${objectName} ${value}?`;
+
+export const ZERO_DELIVERIES_DIALOG_TITLE = 'Confirmar entregas en cero';
+export const ZERO_DELIVERIES_DIALOG_TEXT = (employeeName) => `¿Está seguro de guardar el movimiento de ${employeeName} con 0 entregas?`;
+
+export const OVERWRITE_DIALOG_TITLE = 'Movimiento existente';
+export const OVERWRITE_DIALOG_TEXT = (employeeName, date) =>
+  `Ya existe un movimiento para ${employeeName} en la fecha ${date}. ¿Desea sobrescribirlo?`;
+
+// MOVEMENTS MESSAGES
+export const INVALID_HOURS = 'Las horas trabajadas deben estar entre 0 y 24';
