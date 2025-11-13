@@ -5,12 +5,18 @@
   "password": "90H8j(7c*bFv",
   "port": 3306,
   "dialect": "mysql",
-  "directory": "./src/models",
+  "directory": "./src/auto-models",
   "caseFile": "c",
+  "caseProp": "o",
   "caseModel": "p",
   "lang": "esm",
+  "useDefine": false,
+  "skipTables": [],
+  "singularize": true,
+  "esm": true,
+  "indentation": 2,
   "additional": {
     "timestamps": false
   },
-  "useDefine": true
+  "views": false
 }
