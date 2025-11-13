@@ -5,6 +5,7 @@ import {
   MenuItem,
   InputAdornment,
   IconButton,
+  FormHelperText,
 } from '@mui/material';
 
 const CustomSelect = ({
@@ -17,13 +18,15 @@ const CustomSelect = ({
   icon,
   onIconClick,
   placeholder,
+  error = false,
+  helperText = '',
   ...props
 }) => {
   return (
     <FormControl
       size={size}
+      error={error}
       sx={{
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
         minWidth: '200px',
         '& .MuiOutlinedInput-root': {
           padding: 0,
@@ -82,6 +85,7 @@ const CustomSelect = ({
           </MenuItem>
         ))}
       </Select>
+      {helperText && <FormHelperText>{helperText}</FormHelperText>}
     </FormControl>
   );
 };
