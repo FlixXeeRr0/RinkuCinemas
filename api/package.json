@@ -1,5 +1,6 @@
 {
   "name": "api-rinku-cinemas",
+  "private": true,
   "version": "1.0.0",
   "description": "Payroll System for Rinku Cinemas",
   "main": "src/server.js",

@@ -1,0 +1,17 @@
+{
+  "name": "rinku-cinemas",
+  "author": "Agustin Cardoza Perez",
+  "private": true,
+  "workspaces": [
+    "api",
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=api\" \"npm run dev --workspace=web\"",
+    "build": "npm run build --workspace=web",
+    "start": "npm run start --workspace=api & npm run start --workspace=web"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
