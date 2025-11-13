@@ -1,7 +1,7 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class Employee extends Model {
+export default class Movement extends Model {
   static init(sequelize, DataTypes) {
     return super.init(
       {
@@ -11,40 +11,40 @@ export default class Employee extends Model {
           allowNull: false,
           primaryKey: true,
         },
-        EmployeeCode: {
-          type: DataTypes.STRING(50),
-          allowNull: false,
-          unique: 'EmployeeCode',
-        },
-        FullName: {
-          type: DataTypes.STRING(100),
-          allowNull: false,
-        },
-        RoleID: {
+        EmployeeID: {
           type: DataTypes.INTEGER,
           allowNull: false,
+          references: {
+            model: 'Employee',
+            key: 'ID',
+          },
+        },
+        Date: {
+          type: DataTypes.DATEONLY,
+          allowNull: false,
+        },
+        HoursWorked: {
+          type: DataTypes.DECIMAL(5, 2),
+          allowNull: false,
+          defaultValue: 8.0,
+        },
+        DeliveriesCount: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          defaultValue: 0,
+        },
+        CoveringRoleID: {
+          type: DataTypes.INTEGER,
+          allowNull: true,
           references: {
             model: 'Role',
             key: 'ID',
           },
         },
-        EmployeeTypeID: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          references: {
-            model: 'EmployeeType',
-            key: 'ID',
-          },
-        },
-        Status: {
-          type: DataTypes.BOOLEAN,
-          allowNull: false,
-          defaultValue: 1,
-        },
       },
       {
         sequelize,
-        tableName: 'Employee',
+        tableName: 'Movement',
         timestamps: false,
         indexes: [
           {
@@ -54,20 +54,14 @@ export default class Employee extends Model {
             fields: [{ name: 'ID' }],
           },
           {
-            name: 'EmployeeCode',
-            unique: true,
+            name: 'EmployeeID',
             using: 'BTREE',
-            fields: [{ name: 'EmployeeCode' }],
+            fields: [{ name: 'EmployeeID' }],
           },
           {
-            name: 'RoleID',
+            name: 'CoveringRoleID',
             using: 'BTREE',
-            fields: [{ name: 'RoleID' }],
-          },
-          {
-            name: 'EmployeeTypeID',
-            using: 'BTREE',
-            fields: [{ name: 'EmployeeTypeID' }],
+            fields: [{ name: 'CoveringRoleID' }],
           },
         ],
       }

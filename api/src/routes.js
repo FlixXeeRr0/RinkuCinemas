@@ -1,4 +1,6 @@
-import employee from './controllers/employee.controller.js';
+import employeeController from './controllers/employee.controller.js';
+import roleController from './controllers/role.controller.js';
+import employeeTypeController from './controllers/employeeType.controller.js';
 
 const Router = (app) => {
   // Health check
@@ -11,7 +13,9 @@ const Router = (app) => {
   });
 
   // Endpoints
-  app.use('/api/v1/employee', employee);
+  app.use('/api/v1/employee', employeeController);
+  app.use('/api/v1/role', roleController);
+  app.use('/api/v1/employee-type', employeeTypeController);
 
   // 404 handler
   app.use((req, res) => {

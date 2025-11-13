@@ -1,13 +1,12 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
-import Box from '@mui/material/Box';
 
 import AppBarComponent from '../components/AppBar/AppBar';
-import StartPage from '../pages/start';
-import EmployeePage from '../pages/employees';
-import NotFoundPage from '../pages/notFound';
-import TransactionsPage from '../pages/transactions';
-import ReportsPage from '../pages/reports';
+import StartPage from '../pages/start/startPage.jsx';
+import EmployeePage from '../pages/employees/employeePage.jsx';
+import NotFoundPage from '../pages/notFound/notFoundPage.jsx';
+import TransactionsPage from '../pages/movement/movementPage.jsx';
+import ReportsPage from '../pages/reports/reportsPage.jsx';
 
 const Layout = React.memo(function Layout() {
   return (
