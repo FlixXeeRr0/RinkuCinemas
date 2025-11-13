@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useCallback, useState, useEffect } from 'react';
 
 import { Box, Button, Typography, CircularProgress } from '@mui/material';
@@ -5,7 +6,7 @@ import { FaSearch, FaRegTrashAlt, FaSave } from 'react-icons/fa';
 import { IoPersonAdd } from 'react-icons/io5';
 import { CiEdit } from 'react-icons/ci';
 import { IoMdClose } from 'react-icons/io';
-import { MdNavigateNext, MdNavigateBefore } from 'react-icons/md';
+import { MdNavigateNext, MdNavigateBefore, MdCleaningServices } from 'react-icons/md';
 import { toast } from 'react-toastify';
 
 import { employeeService } from '../../services/employeeService';
@@ -315,18 +316,24 @@ const EmployeePage = () => {
 
         {/* Search bar */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 10, width: '100%' }}>
-          <CustomTextField
-            id="search"
-            label="Buscar"
-            placeholder="Búsqueda por código o nombre"
-            icon={<FaSearch />}
-            onIconClick={handleSearch}
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            onKeyPress={handleSearchKeyPress}
-            disabled={loading || isEditMode || isNewMode}
-            fullWidth
-          />
+          <Box sx={{ display: 'flex', gap: 2, width: '60%'}}>
+            <CustomTextField
+              id="search"
+              label="Buscar Empleado"
+              placeholder="Búsqueda por código o nombre"
+              icon={<FaSearch />}
+              onIconClick={handleSearch}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
+              disabled={loading || isEditMode || isNewMode}
+              fullWidth
+            />
+            <Button sx={{ maxHeight: '36px' }} variant="outlined" onClick={() => resetForm()}>
+              <MdCleaningServices size={20} />
+            </Button>
+          </Box>
+
           <Button
             variant="contained"
             size="large"
