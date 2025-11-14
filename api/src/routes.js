@@ -2,6 +2,7 @@ import employeeController from './controllers/employee.controller.js';
 import roleController from './controllers/role.controller.js';
 import employeeTypeController from './controllers/employeeType.controller.js';
 import movementController from './controllers/movements.controller.js';
+import reportsController from './controllers/reports.controller.js';
 
 const Router = (app) => {
   // Health check
@@ -18,6 +19,7 @@ const Router = (app) => {
   app.use('/api/v1/role', roleController);
   app.use('/api/v1/employee-type', employeeTypeController);
   app.use('/api/v1/movements', movementController);
+  app.use('/api/v1/reports', reportsController);
 
   // 404 handler
   app.use((req, res) => {

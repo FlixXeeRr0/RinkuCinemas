@@ -6,7 +6,7 @@ let theme = createTheme({
     primary: blue,
     secondary: lightBlue,
     background: {
-      default: '#f5f5f5',
+      default: '#f0f0f0',
       paper: '#ffffff',
     },
     text: {

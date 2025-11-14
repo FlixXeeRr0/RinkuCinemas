@@ -8,11 +8,22 @@ import NotFoundPage from '../pages/notFound/notFoundPage.jsx';
 import TransactionsPage from '../pages/movement/movementPage.jsx';
 import ReportsPage from '../pages/reports/reportsPage.jsx';
 
+import theme from '../themes/defaultTheme.js';
+
 const Layout = React.memo(function Layout() {
   return (
-    <div style={{ height: '100svh', backgroundColor: '#f5f5f5' }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        backgroundColor: theme.palette.background.default,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <AppBarComponent />
-      <Outlet />
+      <div style={{ flex: 1, overflow: 'auto' }}>
+        <Outlet />
+      </div>
     </div>
   );
 });
