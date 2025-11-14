@@ -7,6 +7,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
+import theme from '../../themes/defaultTheme';
 
 const CustomTable = ({ columns = [], rows = [], minWidth = 650 }) => {
   return (
@@ -15,9 +16,11 @@ const CustomTable = ({ columns = [], rows = [], minWidth = 650 }) => {
       sx={{
         boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
         borderRadius: '8px',
+        maxHeight: '500px',
+        overflow: 'scroll',
       }}
     >
-      <Table sx={{ minWidth }} aria-label="custom table">
+      <Table sx={{ minWidth }} aria-label="custom table" stickyHeader>
         <TableHead>
           <TableRow>
             {columns.map((col, index) => (
@@ -26,7 +29,7 @@ const CustomTable = ({ columns = [], rows = [], minWidth = 650 }) => {
                 align={col.align || 'left'}
                 sx={{
                   fontWeight: 'bold',
-                  backgroundColor: '#f5f5f5',
+                  backgroundColor: theme.palette.background.default,
                   color: '#333',
                   textTransform: 'capitalize',
                 }}

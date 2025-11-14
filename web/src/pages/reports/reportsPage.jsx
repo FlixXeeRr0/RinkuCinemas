@@ -1,115 +1,227 @@
-import { Box, Button, styled, Typography } from '@mui/material';
 import { useCallback, useState } from 'react';
+
+import { Box, Button, Typography, CircularProgress } from '@mui/material';
 import { FaSearch } from 'react-icons/fa';
+import { MdNavigateNext, MdNavigateBefore, MdCleaningServices } from 'react-icons/md';
+import { toast } from 'react-toastify';
+
+import { employeeService } from '../../services/employeeService';
+import { reportService } from '../../services/reportService';
+
 import CustomTextField from '../../components/CustomTextField';
 import CustomSelect from '../../components/CustomSelect';
 import CustomTable from '../../components/CustomTable';
+import {
+  BorderBottomContainer,
+  FormContainer,
+  MainBox,
+  ContainerBox,
+} from '../../components/StyledComponents';
+import { FOUND_VALUES, NO_FOUND_VALUES, IS_REQUIRED } from '../../config/messages';
+import MonthsEnum from '../../enums/MonthsEnum';
+import theme from '../../themes/defaultTheme';
 
-const MainBox = styled(Box)(({ theme }) => ({
-  height: 'calc(100svh - 61px)',
-  overflow: 'scroll',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: theme.spacing(1),
-}));
-
-const ContainerBox = styled(Box)(({ theme }) => ({
-  backgroundColor: 'white',
-  width: '80%',
-  alignItems: 'center',
-  padding: theme.spacing(2),
-  borderRadius: '8px',
-  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 20,
-}));
-
-const BorderBottomContainer = styled(Box)(({ theme }) => ({
-  borderBottom: `1px solid ${theme.palette.primary.main}`,
-  paddingBottom: theme.spacing(1),
-  width: '100%',
-}));
-
-const FormContainer = styled(Box)(({ theme }) => ({
-  border: `1px solid ${theme.palette.primary.main}`,
-  borderRadius: '8px',
-  width: '100%',
-  height: '100%',
-  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-}));
+const INITIAL_FORM_STATE = {
+  EmployeeID: null,
+  EmployeeCode: '',
+  FullName: '',
+  RoleName: '',
+  EmployeeTypeName: '',
+};
 
 const ReportsPage = () => {
-  const [isEditActive, setIsEditActive] = useState(false);
-  const [month, setMonth] = useState('');
-  const [year, setYeaer] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const [formData, setFormData] = useState(INITIAL_FORM_STATE);
 
-  const months = [
-    { value: '1', label: 'Enero' },
-    { value: '2', label: 'Febrero' },
-    { value: '3', label: 'Marzo' },
-    { value: '4', label: 'Abril' },
-    { value: '5', label: 'Mayo' },
-    { value: '6', label: 'Junio' },
-    { value: '7', label: 'Julio' },
-    { value: '8', label: 'Agosto' },
-    { value: '9', label: 'Septiembre' },
-    { value: '10', label: 'Octubre' },
-    { value: '11', label: 'Noviembre' },
-    { value: '12', label: 'Diciembre' },
-  ];
-  const years = [
-    { value: '1', label: '2024' },
-    { value: '2', label: '2025' },
-  ];
+  // Search results for navigation
+  const [employeesFound, setEmployeesFound] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Period selection
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
+  const [availableYears, setAvailableYears] = useState([]);
+
+  // Report data
+  const [reportData, setReportData] = useState(null);
+  const [showReport, setShowReport] = useState(false);
+
+  // Reset form
+  const resetForm = () => {
+    setFormData(INITIAL_FORM_STATE);
+    setEmployeesFound([]);
+    setCurrentIndex(0);
+    setSearchValue('');
+    setSelectedMonth('');
+    setSelectedYear('');
+    setAvailableYears([]);
+    setReportData(null);
+    setShowReport(false);
+  };
+
+  // Handle search
+  const handleSearch = useCallback(async () => {
+    const searchTxt = searchValue.trim();
+    if (!searchTxt) {
+      toast.error('Por favor ingrese un criterio de búsqueda');
+      return;
+    }
+
+    setLoading(true);
+
+    const employees = await employeeService.search(searchTxt);
+    const totalEmployees = employees.length;
+
+    if (totalEmployees === 0) {
+      toast.error(NO_FOUND_VALUES);
+      resetForm();
+      setLoading(false);
+      return;
+    }
+
+    setEmployeesFound(employees);
+    setCurrentIndex(0);
+    await loadEmployeeData(employees[0]);
+
+    if (totalEmployees > 1) {
+      toast.info(FOUND_VALUES(totalEmployees, 'empleados'));
+    }
+
+    setLoading(false);
+  }, [searchValue]);
+
+  // Load employee data
+  const loadEmployeeData = async (employee) => {
+    const data = {
+      EmployeeID: employee.ID,
+      EmployeeCode: employee.EmployeeCode,
+      FullName: employee.FullName,
+      RoleName: employee.Role?.Name || '',
+      EmployeeTypeName: employee.EmployeeType?.Name || '',
+    };
+
+    setFormData(data);
+    setSelectedMonth('');
+    setSelectedYear('');
+    setReportData(null);
+    setShowReport(false);
+
+    // Load available years
+    const years = await reportService.getYears(employee.ID);
+    if (years && years.length > 0) {
+      setAvailableYears(
+        years.map((year) => ({
+          value: String(year),
+          label: String(year),
+        }))
+      );
+    } else {
+      setAvailableYears([]);
+      toast.info('Este empleado no tiene movimientos registrados');
+    }
+  };
+
+  // Navigate between search results
+  const handleNavigate = async (direction) => {
+    const newIndex =
+      direction === 'next'
+        ? Math.min(currentIndex + 1, employeesFound.length - 1)
+        : Math.max(currentIndex - 1, 0);
+
+    setCurrentIndex(newIndex);
+    await loadEmployeeData(employeesFound[newIndex]);
+  };
+
+  // Handle consult
+  const handleConsult = async () => {
+    if (!selectedMonth) {
+      toast.error('Debe seleccionar un mes');
+      return;
+    }
+
+    if (!selectedYear) {
+      toast.error('Debe seleccionar un año');
+      return;
+    }
+
+    setLoading(true);
+
+    const report = await reportService.getPayroll(formData.EmployeeID, selectedMonth, selectedYear);
+
+    if (!report) {
+      toast.error('No se encontraron movimientos para el periodo seleccionado');
+      setReportData(null);
+      setShowReport(false);
+      setLoading(false);
+      return;
+    }
+
+    setReportData(report);
+    setShowReport(true);
+    setLoading(false);
+  };
+
+  // Handle Enter key on search
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  // Table columns
   const columns = [
-    { field: 'name', label: 'Postre' },
-    { field: 'calories', label: 'Calorías', align: 'right' },
-    { field: 'fat', label: 'Grasa (g)', align: 'right' },
-    { field: 'carbs', label: 'Carbohidratos (g)', align: 'right' },
-    { field: 'protein', label: 'Proteína (g)', align: 'right' },
+    { field: 'ID', label: 'ID', align: 'center' },
+    { field: 'Date', label: 'Fecha', align: 'center' },
+    { field: 'HoursWorked', label: 'Horas Trabajadas', align: 'center' },
+    { field: 'DeliveriesCount', label: 'Entregas Realizadas', align: 'center' },
+    { field: 'HourlyBonus', label: 'Bono por Hora', align: 'right' },
+    { field: 'BaseSalary', label: 'Sueldo Base', align: 'right' },
+    { field: 'RoleBonus', label: 'Bono por Rol', align: 'right' },
+    { field: 'DeliveryBonus', label: 'Bono de Entregas', align: 'right' },
   ];
 
-  const rows = [
-    { name: 'Frozen yoghurt', calories: 159, fat: 6.0, carbs: 24, protein: 4.0 },
-    { name: 'Ice cream sandwich', calories: 237, fat: 9.0, carbs: 37, protein: 4.3 },
-    { name: 'Eclair', calories: 262, fat: 16.0, carbs: 24, protein: 6.0 },
-    { name: 'Cupcake', calories: 305, fat: 3.7, carbs: 67, protein: 4.3 },
-    { name: 'Gingerbread', calories: 356, fat: 16.0, carbs: 49, protein: 3.9 },
-  ];
-
-  const handleSearch = useCallback(() => {
-    console.log('Buscando...');
-  }, []);
-
-  const handleRoleChange = (event) => {
-    setRole(event.target.value);
-  };
-
-  const handleTypeChange = (event) => {
-    setType(event.target.value);
-  };
+  // Format table rows
+  const rows = reportData
+    ? reportData.movements.map((movement) => ({
+        id: movement.ID,
+        ID: movement.ID,
+        Date: new Date(movement.Date).toLocaleDateString('es-MX'),
+        HoursWorked: movement.HoursWorked.toFixed(2),
+        DeliveriesCount: movement.DeliveriesCount,
+        HourlyBonus: `$${movement.HourlyBonus.toFixed(2)}`,
+        BaseSalary: `$${movement.BaseSalary.toFixed(2)}`,
+        RoleBonus: `$${movement.RoleBonus.toFixed(2)}`,
+        DeliveryBonus: `$${movement.DeliveryBonus.toFixed(2)}`,
+      }))
+    : [];
 
   return (
     <MainBox>
       <ContainerBox>
         <BorderBottomContainer>
           <Typography variant="h4" sx={{ textAlign: 'start', fontWeight: 500 }}>
-            Reporte de movimientos y saldos
+            Reporte de Nómina
           </Typography>
         </BorderBottomContainer>
 
-        {/* Finder */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 10, width: '100%' }}>
+        {/* Search bar */}
+        <Box sx={{ display: 'flex', width: '100%', gap: 3 }}>
           <CustomTextField
             id="search"
-            label="Buscar..."
-            placeholder="Búsqueda por número de empleado"
+            label="Buscar Empleado"
+            placeholder="Búsqueda por código o nombre"
             icon={<FaSearch />}
             onIconClick={handleSearch}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onKeyPress={handleSearchKeyPress}
+            disabled={loading}
+            fullWidth
           />
+          <Button sx={{ maxHeight: '36px' }} variant="outlined" onClick={() => resetForm()}>
+            <MdCleaningServices size={20} />
+          </Button>
         </Box>
 
         {/* Form */}
@@ -122,73 +234,284 @@ const ReportsPage = () => {
               justifyContent: 'space-between',
             }}
           >
-            <BorderBottomContainer
-              sx={{ display: 'flex', gap: 2, flexDirection: 'column', padding: 2 }}
-            >
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Typography sx={{ textAlign: 'start' }}>Número de empleado:</Typography>
-                <CustomTextField id="employeeNumber" placeholder="Número de empleado" />
-              </Box>
-
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Typography sx={{ textAlign: 'start' }}>Nombre completo:</Typography>
-                <CustomTextField id="fullName" placeholder="Nombre completo" />
-              </Box>
-
-              <Box sx={{ display: 'flex', gap: 3, marginTop: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '50%' }}>
-                  <Typography sx={{ textAlign: 'start' }}>Rol:</Typography>
-                  <CustomTextField id="role" fullWidth />
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '50%' }}>
-                  <Typography sx={{ textAlign: 'start' }}>Tipo:</Typography>
-                  <CustomTextField id="employeeType" fullWidth />
-                </Box>
-              </Box>
-            </BorderBottomContainer>
-
-            <Box sx={{ display: 'flex', gap: 3, marginTop: 1, padding: 2 }}>
-              {/* Select to choise a month */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Typography sx={{ textAlign: 'start' }}>Mes:</Typography>
-                <CustomSelect
-                  id="month"
-                  placeholder="Selecciona un mes"
-                  value={month}
-                  onChange={(e) => setMonth(e.target.value)}
-                  options={months}
-                  onIconClick={() => console.log('Abrir opciones')}
-                />
-              </Box>
-
-              {/* Select to choise a year */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Typography sx={{ textAlign: 'start' }}>Año:</Typography>
-                <CustomSelect
-                  id="year"
-                  placeholder="Selecciona un año"
-                  value={year}
-                  onChange={(e) => setYeaer(e.target.value)}
-                  options={years}
-                  onIconClick={() => console.log('Abrir opciones')}
-                />
-              </Box>
-            </Box>
-
-            <Box sx={{ display: 'flex', flexDirection: 'column', padding: 2, gap: 2 }}>
-              <Button
-                fullWidth
-                variant="contained"
+            {loading ? (
+              <Box
                 sx={{
-                  maxHeight: '36px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '400px',
                 }}
-                onClick={() => setIsEditActive(!isEditActive)}
               >
-                Consultar
-              </Button>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <>
+                {/* Employee Info Section */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    gap: 2,
+                    flexDirection: 'column',
+                    padding: 2,
+                    borderBottom: '1px solid #e0e0e0',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(2, 1fr)',
+                      gap: 2,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <Typography sx={{ textAlign: 'start', fontWeight: 500 }}>
+                        Código de empleado:
+                      </Typography>
+                      <CustomTextField
+                        id="employeeCode"
+                        placeholder="Código de empleado"
+                        value={formData.EmployeeCode}
+                        disabled
+                        fullWidth
+                      />
+                    </Box>
 
-              <CustomTable columns={columns} rows={rows} />
-            </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <Typography sx={{ textAlign: 'start', fontWeight: 500 }}>
+                        Nombre completo:
+                      </Typography>
+                      <CustomTextField
+                        id="fullName"
+                        placeholder="Nombre completo"
+                        value={formData.FullName}
+                        disabled
+                        fullWidth
+                      />
+                    </Box>
+
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <Typography sx={{ textAlign: 'start', fontWeight: 500 }}>Rol:</Typography>
+                      <CustomTextField
+                        id="roleName"
+                        placeholder="Rol"
+                        value={formData.RoleName}
+                        disabled
+                        fullWidth
+                      />
+                    </Box>
+
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <Typography sx={{ textAlign: 'start', fontWeight: 500 }}>
+                        Tipo de empleado:
+                      </Typography>
+                      <CustomTextField
+                        id="employeeTypeName"
+                        placeholder="Tipo de empleado"
+                        value={formData.EmployeeTypeName}
+                        disabled
+                        fullWidth
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+
+                {/* Period Selection */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    gap: 3,
+                    padding: 2,
+                    alignItems: 'end',
+                    borderBottom: '1px solid #e0e0e0',
+                  }}
+                >
+                  <Box sx={{ flex: 1 }}>
+                    <Typography sx={{ textAlign: 'start', fontWeight: 500, mb: 1 }}>
+                      Mes:
+                    </Typography>
+                    <CustomSelect
+                      id="month"
+                      placeholder="Selecciona un mes"
+                      value={selectedMonth}
+                      onChange={(e) => setSelectedMonth(e.target.value)}
+                      options={MonthsEnum}
+                      disabled={!formData.EmployeeID}
+                      fullWidth
+                    />
+                  </Box>
+
+                  <Box sx={{ flex: 1 }}>
+                    <Typography sx={{ textAlign: 'start', fontWeight: 500, mb: 1 }}>
+                      Año:
+                    </Typography>
+                    <CustomSelect
+                      id="year"
+                      placeholder="Selecciona un año"
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(e.target.value)}
+                      options={availableYears}
+                      disabled={!formData.EmployeeID || availableYears.length === 0}
+                      fullWidth
+                    />
+                  </Box>
+
+                  <Button
+                    variant="contained"
+                    sx={{
+                      height: '40px',
+                      minWidth: '150px',
+                    }}
+                    onClick={handleConsult}
+                    disabled={!formData.EmployeeID || !selectedMonth || !selectedYear}
+                  >
+                    Consultar
+                  </Button>
+                </Box>
+
+                {/* Navigation buttons */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: 2,
+                    borderBottom: showReport ? '1px solid #e0e0e0' : 'none',
+                  }}
+                >
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    {employeesFound.length > 1 && (
+                      <>
+                        <Button
+                          variant="contained"
+                          sx={{ maxHeight: '36px', minWidth: '100px' }}
+                          startIcon={<MdNavigateBefore />}
+                          onClick={() => handleNavigate('prev')}
+                          disabled={currentIndex === 0 || loading}
+                        >
+                          Anterior
+                        </Button>
+                        <Button
+                          variant="contained"
+                          sx={{ maxHeight: '36px', minWidth: '100px' }}
+                          endIcon={<MdNavigateNext />}
+                          onClick={() => handleNavigate('next')}
+                          disabled={currentIndex === employeesFound.length - 1 || loading}
+                        >
+                          Siguiente
+                        </Button>
+                        <Typography sx={{ display: 'flex', alignItems: 'center', ml: 1 }}>
+                          {currentIndex + 1} de {employeesFound.length}
+                        </Typography>
+                      </>
+                    )}
+                  </Box>
+                </Box>
+
+                {/* Report Section */}
+                {showReport && reportData && (
+                  <Box sx={{ padding: 2 }}>
+                    {/* Table */}
+                    <Box sx={{ mb: 3 }}>
+                      <CustomTable columns={columns} rows={rows} />
+                    </Box>
+
+                    {/* Totals */}
+                    <Box
+                      sx={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(2, 1fr)',
+                        gap: 4,
+                        backgroundColor: theme.palette.background.default,
+                        padding: 3,
+                        borderRadius: '8px',
+                      }}
+                    >
+                      {/* Left Column - Base Totals */}
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                          Totales Base
+                        </Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography sx={{ fontWeight: 500 }}>Total Sueldo Base:</Typography>
+                          <Typography sx={{ fontWeight: 600, color: '#1976d2' }}>
+                            ${reportData.totals.totalBaseSalary.toFixed(2)}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography sx={{ fontWeight: 500 }}>Total Bono por Rol:</Typography>
+                          <Typography sx={{ fontWeight: 600, color: '#1976d2' }}>
+                            ${reportData.totals.totalRoleBonus.toFixed(2)}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography sx={{ fontWeight: 500 }}>Total Bono por Entregas:</Typography>
+                          <Typography sx={{ fontWeight: 600, color: '#1976d2' }}>
+                            ${reportData.totals.totalDeliveryBonus.toFixed(2)}
+                          </Typography>
+                        </Box>
+                        {reportData.totals.foodVouchers > 0 && (
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Typography sx={{ fontWeight: 500 }}>
+                              Vales de Despensa (4%):
+                            </Typography>
+                            <Typography sx={{ fontWeight: 600, color: '#1976d2' }}>
+                              +${reportData.totals.foodVouchers.toFixed(2)}
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+
+                      {/* Right Column - Final Calculation */}
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                          Cálculo Final
+                        </Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography sx={{ fontWeight: 500 }}>Sueldo Bruto:</Typography>
+                          <Typography sx={{ fontWeight: 600, color: '#2e7d32' }}>
+                            ${reportData.totals.grossSalary.toFixed(2)}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography sx={{ fontWeight: 500 }}>ISR (9%):</Typography>
+                          <Typography sx={{ fontWeight: 600, color: '#d32f2f' }}>
+                            -${reportData.totals.isrBase.toFixed(2)}
+                          </Typography>
+                        </Box>
+                        {reportData.totals.isrAdditional > 0 && (
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Typography sx={{ fontWeight: 500 }}>ISR Adicional (3%):</Typography>
+                            <Typography sx={{ fontWeight: 600, color: '#d32f2f' }}>
+                              -${reportData.totals.isrAdditional.toFixed(2)}
+                            </Typography>
+                          </Box>
+                        )}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            pt: 2,
+                            borderTop: '2px solid #1976d2',
+                            mt: 1,
+                          }}
+                        >
+                          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                            Sueldo Neto:
+                          </Typography>
+                          <Typography
+                            variant="h6"
+                            sx={{ fontWeight: 700, color: '#1976d2', fontSize: '1.5rem' }}
+                          >
+                            ${reportData.totals.netSalary.toFixed(2)}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
+              </>
+            )}
           </Box>
         </FormContainer>
       </ContainerBox>

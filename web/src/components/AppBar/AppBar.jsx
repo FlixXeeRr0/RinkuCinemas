@@ -1,10 +1,12 @@
-import { styled } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+
 import { FaHome, FaUsers, FaClipboardList } from 'react-icons/fa';
 import { GiArchiveRegister } from 'react-icons/gi';
-import Typography from '@mui/material/Typography';
-import { useNavigate } from 'react-router-dom';
+
 import MenuEnum from '../../enums/MenuEnum';
 
 const StyledAppBar = styled(Box)(({ theme }) => ({
@@ -12,10 +14,35 @@ const StyledAppBar = styled(Box)(({ theme }) => ({
   color: '#fff',
   padding: theme.spacing(1),
   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)',
+  position: 'sticky',
+  top: 0,
+  zIndex: 1100,
+  display: 'flex',
+  gap: theme.spacing(0.5),
+  flexWrap: 'wrap',
+  justifyContent: 'center',
+  [theme.breakpoints.up('sm')]: {
+    gap: theme.spacing(1),
+    flexWrap: 'nowrap',
+  },
 }));
 
 const CustomButton = styled(Button)(({ theme }) => ({
   cursor: 'pointer',
+  minWidth: 'auto',
+  padding: theme.spacing(1, 3),
+  [theme.breakpoints.down('sm')]: {
+    '& .MuiTypography-root': {
+      display: 'none',
+    },
+    minWidth: '48px',
+    '& .MuiButton-startIcon': {
+      margin: 0,
+      '& svg': {
+        fontSize: '30px',
+      },
+    },
+  },
 }));
 
 const AppBarComponent = () => {
@@ -28,7 +55,7 @@ const AppBarComponent = () => {
         startIcon={<FaHome />}
         onClick={() => navigate(MenuEnum.START_PAGE)}
       >
-        <Typography variant="h5" sx={{ fontWeight: 500 }}>
+        <Typography variant="h6" sx={{ fontWeight: 500 }}>
           Inicio
         </Typography>
       </CustomButton>
@@ -38,7 +65,7 @@ const AppBarComponent = () => {
         startIcon={<FaUsers />}
         onClick={() => navigate(MenuEnum.EMPLOYEES_PAGE)}
       >
-        <Typography variant="h5" sx={{ fontWeight: 500 }}>
+        <Typography variant="h6" sx={{ fontWeight: 500 }}>
           Empleados
         </Typography>
       </CustomButton>
@@ -48,7 +75,7 @@ const AppBarComponent = () => {
         startIcon={<GiArchiveRegister />}
         onClick={() => navigate(MenuEnum.TRANSACTIONS_PAGE)}
       >
-        <Typography variant="h5" sx={{ fontWeight: 500 }}>
+        <Typography variant="h6" sx={{ fontWeight: 500 }}>
           Captura
         </Typography>
       </CustomButton>
@@ -58,7 +85,7 @@ const AppBarComponent = () => {
         startIcon={<FaClipboardList />}
         onClick={() => navigate(MenuEnum.REPORT_PAGE)}
       >
-        <Typography variant="h5" sx={{ fontWeight: 500 }}>
+        <Typography variant="h6" sx={{ fontWeight: 500 }}>
           Reportes
         </Typography>
       </CustomButton>
