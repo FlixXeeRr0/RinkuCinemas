@@ -36,10 +36,6 @@ router.get('/search', async (req, res, next) => {
   try {
     const { query } = req.query;
 
-    if (!query) {
-      return res.status(400).json({ message: 'Query parameter is required' });
-    }
-
     const employees = await db.Employee.findAll({
       where: {
         [Op.and]: [
@@ -58,10 +54,6 @@ router.get('/search', async (req, res, next) => {
       ],
       order: [['ID', 'ASC']],
     });
-
-    if (employees.length === 0) {
-      return res.status(404).json({ message: 'No se encontraron empleados' });
-    }
 
     return res.status(200).json(employees);
   } catch (error) {
