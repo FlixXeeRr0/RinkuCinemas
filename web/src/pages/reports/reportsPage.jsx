@@ -322,38 +322,39 @@ const ReportsPage = () => {
                     display: 'flex',
                     gap: 3,
                     padding: 2,
-                    alignItems: 'end',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                     borderBottom: '1px solid #e0e0e0',
                   }}
                 >
-                  <Box sx={{ flex: 1 }}>
-                    <Typography sx={{ textAlign: 'start', fontWeight: 500, mb: 1 }}>
-                      Mes:
-                    </Typography>
-                    <CustomSelect
-                      id="month"
-                      placeholder="Selecciona un mes"
-                      value={selectedMonth}
-                      onChange={(e) => setSelectedMonth(e.target.value)}
-                      options={MonthsEnum}
-                      disabled={!formData.EmployeeID}
-                      fullWidth
-                    />
-                  </Box>
+                  <Box sx={{ display: 'flex', gap: 4 }}>
+                    <Box sx={{ display: 'flex', gap: 2, width: '100%', justifyContent: 'start', alignItems: 'center' }}>
+                      <Typography sx={{ textAlign: 'center', fontWeight: 500}}>
+                        Mes:
+                      </Typography>
+                      <CustomSelect
+                        id="month"
+                        placeholder="Selecciona un mes"
+                        value={selectedMonth}
+                        onChange={(e) => setSelectedMonth(e.target.value)}
+                        options={MonthsEnum}
+                        disabled={!formData.EmployeeID}
+                      />
+                    </Box>
 
-                  <Box sx={{ flex: 1 }}>
-                    <Typography sx={{ textAlign: 'start', fontWeight: 500, mb: 1 }}>
-                      Año:
-                    </Typography>
-                    <CustomSelect
-                      id="year"
-                      placeholder="Selecciona un año"
-                      value={selectedYear}
-                      onChange={(e) => setSelectedYear(e.target.value)}
-                      options={availableYears}
-                      disabled={!formData.EmployeeID || availableYears.length === 0}
-                      fullWidth
-                    />
+                    <Box sx={{ display: 'flex', gap: 2, width: '100%', justifyContent: 'start', alignItems: 'center' }}>
+                      <Typography sx={{ textAlign: 'center', fontWeight: 500 }}>
+                        Año:
+                      </Typography>
+                      <CustomSelect
+                        id="year"
+                        placeholder="Selecciona un año"
+                        value={selectedYear}
+                        onChange={(e) => setSelectedYear(e.target.value)}
+                        options={availableYears}
+                        disabled={!formData.EmployeeID || availableYears.length === 0}
+                      />
+                    </Box>
                   </Box>
 
                   <Button
